@@ -2,6 +2,8 @@ const router = require("express").Router();
 
 const bcrypt = require("bcryptjs");
 
+const jwt = require("jsonwebtoken");
+
 const authModel = require("./auth-model");
 
 router.post("/register", (req, res) => {
@@ -26,16 +28,31 @@ router.post("/register", (req, res) => {
 
 router.post("/login", (req, res) => {
   // implement login
+
+  const generateToken = user => {
+    const payload = {
+      subject: user.id,
+      username: user.username
+    };
+
+    const secret = "Tell me something to believe in";
+
+    const options = { expiresIn: "3hr" };
+
+    return jwt.sign(payload, secret, options);
+  };
+
   authModel
     .findBy(req.body.username)
     .then(usr => {
       console.log(usr);
       if (usr && bcrypt.compareSync(req.body.password, usr[0].password)) {
         req.session.user = req.body.username;
-        // const token = generateToken(usr);
+        const token = generateToken(usr);
+        req.session.token = token;
         res.status(200).json({
-          message: `Welcome, ${usr[0].username}!`
-          // token
+          message: `Welcome, ${usr[0].username}!`,
+          token
         });
       } else {
         res.status(400).json({ message: "Invalid username/password" });
