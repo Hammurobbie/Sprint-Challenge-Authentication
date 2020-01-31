@@ -1,10 +1,12 @@
-const router = require('express').Router();
+const router = require("express").Router();
 
-router.post('/register', (req, res) => {
+const bcrypt = require("bcryptjs");
+
+router.post("/register", (req, res) => {
   // implement registration
 });
 
-router.post('/login', (req, res) => {
+router.post("/login", (req, res) => {
   // implement login
 });
 
